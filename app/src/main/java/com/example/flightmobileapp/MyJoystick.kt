@@ -124,35 +124,45 @@ class MyJoystick : SurfaceView, SurfaceHolder.Callback, OnTouchListener {
     }
 
     override fun surfaceDestroyed(holder: SurfaceHolder) {}
+
+
     override fun onTouch(v: View, e: MotionEvent): Boolean {
         if (v == this) {
             if (e.action != MotionEvent.ACTION_UP) {
-                val displacement = Math.sqrt(
-                    Math.pow(
-                        e.x - centerX.toDouble(),
-                        2.0
-                    ) + Math.pow(e.y - centerY.toDouble(), 2.0)
-                ).toFloat()
-                if (displacement < baseRadius) {
-                    drawJoystick(e.x, e.y)
-                    joystickCallback!!.onJoystickMoved(
-                        (e.x - centerX) / baseRadius,
-                        (e.y - centerY) / baseRadius,
-                        id
-                    )
+                val x1: Float = e.rawX - MotionEvent.AXIS_X
+                val y1: Float = e.rawY - MotionEvent.AXIS_Y
+                val inLim: Float = Math.sqrt(x1 * x1 + y1 * y1.toDouble()).toFloat()
+                var knobPositionX: Float = x1
+                var knobPositionY: Float = y1
+
+                if (inLim < baseRadius/2) {
+                    knobPositionX = x1
+                    knobPositionY = y1
                 } else {
-                    val ratio = baseRadius / displacement
-                    val constrainedX = centerX + (e.x - centerX) * ratio
-                    val constrainedY = centerY + (e.y - centerY) * ratio
-                    drawJoystick(constrainedX, constrainedY)
-                    joystickCallback!!.onJoystickMoved(
-                        (constrainedX - centerX) / baseRadius,
-                        (constrainedY - centerY) / baseRadius,
-                        id
-                    )
+                    if (x1 === 0f) {
+                        knobPositionY = baseRadius/2
+                        if (y1 < 0) {
+                            knobPositionY *= -1
+                        }
+                    } else {
+                        val m = (y1 / x1).toDouble()
+                        val a = m * m + 1
+                        val b = 2 * m * y1 - 2 * m * m * x1
+                        val c: Double =
+                            m * m * x1 * x1 - 2 * m * y1 * x1 + y1 * y1 - baseRadius * baseRadius/4
+                        if (x1 > 0) {
+                            knobPositionX = ((-b + Math.sqrt(b * b - 4 * a * c)) / (2 * a)).toFloat()
+                        } else {
+                            knobPositionX = ((-b - Math.sqrt(b * b - 4 * a * c)) / (2 * a)).toFloat()
+                        }
+                        knobPositionY = (m * (knobPositionX - x1) + y1).toFloat()
+                    }
                 }
-            } else drawJoystick(centerX, centerY)
-            joystickCallback!!.onJoystickMoved(0f, 0f, id)
+                drawJoystick(knobPositionX, knobPositionY)
+            } else {
+                drawJoystick(centerX, centerY)
+                joystickCallback!!.onJoystickMoved(0f, 0f, id)
+            }
         }
         return true
     }
