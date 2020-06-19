@@ -1,59 +1,159 @@
 package com.example.flightmobileapp
 
 import android.content.Context
-import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
-import android.graphics.PointF
+import android.graphics.PorterDuff
 import android.util.AttributeSet
 import android.view.MotionEvent
+import android.view.SurfaceHolder
+import android.view.SurfaceView
 import android.view.View
-import kotlin.math.min
+import android.view.View.OnTouchListener
 
 
-class MyJoystick: View {
-
-    private val paint = Paint().apply {
-        style = Paint.Style.STROKE
-        color = Color.parseColor("#FFC107")
-        isAntiAlias = true
+class MyJoystick : SurfaceView, SurfaceHolder.Callback, OnTouchListener {
+    private var centerX = 0f
+    private var centerY = 0f
+    private var baseRadius = 0f
+    private var hatRadius = 0f
+    private var joystickCallback: JoystickListener? = null
+    private val ratio = 5 //The smaller, the more shading will occur
+    private fun setupDimensions() {
+        centerX = width / 2.toFloat()
+        centerY = height / 2.toFloat()
+        baseRadius = Math.min(width, height) / 3.toFloat()
+        hatRadius = Math.min(width, height) / 5.toFloat()
     }
 
-    @JvmOverloads constructor(
-        context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
-
-    ) : super (context, attrs, defStyleAttr) {
-
+    constructor(context: Context?) : super(context) {
+        holder.addCallback(this)
+        setOnTouchListener(this)
+        if (context is JoystickListener) joystickCallback =
+            context
     }
 
-
-    private var radius: Float = 120f
-    private var center: PointF = PointF(250f, 750f)
-    // calculate positions and sizes here, not when drawing
-    override fun onSizeChanged(width: Int, height: Int, oldw: Int, oldh: Int) {
-    // make sure actual code handles padding well.
-        radius = 0.3f* min(width, height).toFloat()
-        center = PointF(width/2.0f, height/2.0f)
+    constructor(
+        context: Context?,
+        attributes: AttributeSet?,
+        style: Int
+    ) : super(context, attributes, style) {
+        holder.addCallback(this)
+        setOnTouchListener(this)
+        if (context is JoystickListener) joystickCallback =
+            context
     }
 
-    override fun onDraw(canvas: Canvas) {
-        canvas.drawCircle(center.x, center.y, radius, paint)
+    constructor(context: Context?, attributes: AttributeSet?) : super(
+        context,
+        attributes
+    ) {
+        holder.addCallback(this)
+        setOnTouchListener(this)
+        if (context is JoystickListener) joystickCallback =
+            context
     }
 
-    override fun onTouchEvent(event: MotionEvent?): Boolean {
-        if (event == null) {
-            return true
+    private fun drawJoystick(newX: Float, newY: Float) {
+        if (holder.surface.isValid) {
+            val myCanvas = this.holder.lockCanvas() //Stuff to draw
+            val colors = Paint()
+            myCanvas.drawColor(
+                Color.TRANSPARENT,
+                PorterDuff.Mode.CLEAR
+            ) // Clear the BG
+
+            //First determine the sin and cos of the angle that the touched point is at relative to the center of the joystick
+            val hypotenuse = Math.sqrt(
+                Math.pow(
+                    newX - centerX.toDouble(),
+                    2.0
+                ) + Math.pow(newY - centerY.toDouble(), 2.0)
+            ).toFloat()
+            val sin = (newY - centerY) / hypotenuse //sin = o/h
+            val cos = (newX - centerX) / hypotenuse //cos = a/h
+
+            //Draw the base first before shading
+            colors.setARGB(255, 100, 100, 100)
+            myCanvas.drawCircle(centerX, centerY, baseRadius, colors)
+            for (i in 1..(baseRadius / ratio).toInt()) {
+                colors.setARGB(
+                    150 / i,
+                    255,
+                    0,
+                    0
+                ) //Gradually decrease the shade of black drawn to create a nice shading effect
+                myCanvas.drawCircle(
+                    newX - cos * hypotenuse * (ratio / baseRadius) * i,
+                    newY - sin * hypotenuse * (ratio / baseRadius) * i,
+                    i * (hatRadius * ratio / baseRadius),
+                    colors
+                ) //Gradually increase the size of the shading effect
+            }
+
+            //Drawing the joystick hat
+            for (i in 0..(hatRadius / ratio).toInt()) {
+                colors.setARGB(
+                    220,
+                    (i * (220 * ratio / hatRadius)).toInt(),
+                    (i * (220 * ratio / hatRadius)).toInt(),
+                    220
+                ) //Change the joystick color for shading purposes
+                myCanvas.drawCircle(
+                    newX,
+                    newY,
+                    hatRadius - i.toFloat() * ratio / 2,
+                    colors
+                ) //Draw the shading for the hat
+            }
+            holder.unlockCanvasAndPost(myCanvas) //Write the new drawing to the SurfaceView
         }
-        when (event?.action) {
-            MotionEvent.ACTION_DOWN -> TODO()
-            MotionEvent.ACTION_MOVE -> touchMove(event.x, event.y)
-            MotionEvent.ACTION_UP -> TODO()
+    }
+
+    override fun surfaceCreated(holder: SurfaceHolder) {
+        setupDimensions()
+        drawJoystick(centerX, centerY)
+    }
+
+    override fun surfaceChanged(
+        holder: SurfaceHolder,
+        format: Int,
+        width: Int,
+        height: Int
+    ) {
+    }
+
+    override fun surfaceDestroyed(holder: SurfaceHolder) {}
+    override fun onTouch(v: View, e: MotionEvent): Boolean {
+        if (v == this) {
+            if (e.action != MotionEvent.ACTION_UP) {
+                val displacement = Math.sqrt(
+                    Math.pow(
+                        e.x - centerX.toDouble(),
+                        2.0
+                    ) + Math.pow(e.y - centerY.toDouble(), 2.0)
+                ).toFloat()
+                if (displacement < baseRadius) {
+                    drawJoystick(e.x, e.y)
+                    joystickCallback!!.onJoystickMoved(
+                        (e.x - centerX) / baseRadius,
+                        (e.y - centerY) / baseRadius,
+                        id
+                    )
+                } else {
+                    val ratio = baseRadius / displacement
+                    val constrainedX = centerX + (e.x - centerX) * ratio
+                    val constrainedY = centerY + (e.y - centerY) * ratio
+                    drawJoystick(constrainedX, constrainedY)
+                    joystickCallback!!.onJoystickMoved(
+                        (constrainedX - centerX) / baseRadius,
+                        (constrainedY - centerY) / baseRadius,
+                        id
+                    )
+                }
+            } else drawJoystick(centerX, centerY)
+            joystickCallback!!.onJoystickMoved(0f, 0f, id)
         }
         return true
-    }
-    private fun touchMove(x: Float, y: Float){
-        TODO("Update positions and properties of drawn items")
-        // will render again the screen.
-        invalidate()
     }
 }
