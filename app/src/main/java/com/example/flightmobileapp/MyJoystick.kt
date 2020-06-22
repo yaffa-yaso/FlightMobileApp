@@ -1,6 +1,7 @@
 package com.example.flightmobileapp
 
 import android.content.Context
+import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.PorterDuff
@@ -10,6 +11,7 @@ import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.view.View
 import android.view.View.OnTouchListener
+import kotlin.math.sqrt
 
 
 class MyJoystick : SurfaceView, SurfaceHolder.Callback, OnTouchListener {
@@ -22,8 +24,8 @@ class MyJoystick : SurfaceView, SurfaceHolder.Callback, OnTouchListener {
     private fun setupDimensions() {
         centerX = width / 2.toFloat()
         centerY = height / 2.toFloat()
-        baseRadius = Math.min(width, height) / 3.toFloat()
-        hatRadius = Math.min(width, height) / 5.toFloat()
+        baseRadius = width.coerceAtMost(height) / 3.toFloat()
+        hatRadius = width.coerceAtMost(height) / 7.toFloat()
     }
 
     constructor(context: Context?) : super(context) {
@@ -56,56 +58,15 @@ class MyJoystick : SurfaceView, SurfaceHolder.Callback, OnTouchListener {
 
     private fun drawJoystick(newX: Float, newY: Float) {
         if (holder.surface.isValid) {
-            val myCanvas = this.holder.lockCanvas() //Stuff to draw
+            val myCanvas: Canvas = this.holder.lockCanvas() //Stuff to draw
             val colors = Paint()
-            myCanvas.drawColor(
-                Color.TRANSPARENT,
-                PorterDuff.Mode.CLEAR
-            ) // Clear the BG
-
-            //First determine the sin and cos of the angle that the touched point is at relative to the center of the joystick
-            val hypotenuse = Math.sqrt(
-                Math.pow(
-                    newX - centerX.toDouble(),
-                    2.0
-                ) + Math.pow(newY - centerY.toDouble(), 2.0)
-            ).toFloat()
-            val sin = (newY - centerY) / hypotenuse //sin = o/h
-            val cos = (newX - centerX) / hypotenuse //cos = a/h
-
             //Draw the base first before shading
-            colors.setARGB(255, 100, 100, 100)
+            colors.setARGB(255, 32, 32, 32)
             myCanvas.drawCircle(centerX, centerY, baseRadius, colors)
-            for (i in 1..(baseRadius / ratio).toInt()) {
-                colors.setARGB(
-                    150 / i,
-                    255,
-                    0,
-                    0
-                ) //Gradually decrease the shade of black drawn to create a nice shading effect
-                myCanvas.drawCircle(
-                    newX - cos * hypotenuse * (ratio / baseRadius) * i,
-                    newY - sin * hypotenuse * (ratio / baseRadius) * i,
-                    i * (hatRadius * ratio / baseRadius),
-                    colors
-                ) //Gradually increase the size of the shading effect
-            }
 
-            //Drawing the joystick hat
-            for (i in 0..(hatRadius / ratio).toInt()) {
-                colors.setARGB(
-                    220,
-                    (i * (220 * ratio / hatRadius)).toInt(),
-                    (i * (220 * ratio / hatRadius)).toInt(),
-                    220
-                ) //Change the joystick color for shading purposes
-                myCanvas.drawCircle(
-                    newX,
-                    newY,
-                    hatRadius - i.toFloat() * ratio / 2,
-                    colors
-                ) //Draw the shading for the hat
-            }
+            colors.setARGB(255, 95,95,95)
+            myCanvas.drawCircle(centerX, centerY, hatRadius, colors)
+
             holder.unlockCanvasAndPost(myCanvas) //Write the new drawing to the SurfaceView
         }
     }
@@ -131,7 +92,7 @@ class MyJoystick : SurfaceView, SurfaceHolder.Callback, OnTouchListener {
             if (e.action != MotionEvent.ACTION_UP) {
                 val x1: Float = e.rawX - MotionEvent.AXIS_X
                 val y1: Float = e.rawY - MotionEvent.AXIS_Y
-                val inLim: Float = Math.sqrt(x1 * x1 + y1 * y1.toDouble()).toFloat()
+                val inLim: Float = sqrt(x1 * x1 + y1 * y1)
                 var knobPositionX: Float = x1
                 var knobPositionY: Float = y1
 
@@ -139,7 +100,7 @@ class MyJoystick : SurfaceView, SurfaceHolder.Callback, OnTouchListener {
                     knobPositionX = x1
                     knobPositionY = y1
                 } else {
-                    if (x1 === 0f) {
+                    if (x1 == 0f) {
                         knobPositionY = baseRadius/2
                         if (y1 < 0) {
                             knobPositionY *= -1
@@ -150,15 +111,18 @@ class MyJoystick : SurfaceView, SurfaceHolder.Callback, OnTouchListener {
                         val b = 2 * m * y1 - 2 * m * m * x1
                         val c: Double =
                             m * m * x1 * x1 - 2 * m * y1 * x1 + y1 * y1 - baseRadius * baseRadius/4
-                        if (x1 > 0) {
-                            knobPositionX = ((-b + Math.sqrt(b * b - 4 * a * c)) / (2 * a)).toFloat()
+
+                        knobPositionX = if(x1 > 0) {
+                            ((-b + sqrt(b * b - 4 * a * c)) / (2 * a)).toFloat()
                         } else {
-                            knobPositionX = ((-b - Math.sqrt(b * b - 4 * a * c)) / (2 * a)).toFloat()
+                            ((-b - sqrt(b * b - 4 * a * c)) / (2 * a)).toFloat()
                         }
                         knobPositionY = (m * (knobPositionX - x1) + y1).toFloat()
                     }
                 }
                 drawJoystick(knobPositionX, knobPositionY)
+                joystickCallback!!.onJoystickMoved((knobPositionX - centerX)/baseRadius,
+                    (knobPositionY - centerY)/baseRadius, getId());
             } else {
                 drawJoystick(centerX, centerY)
                 joystickCallback!!.onJoystickMoved(0f, 0f, id)
