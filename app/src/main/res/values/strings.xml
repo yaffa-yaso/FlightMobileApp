@@ -12,4 +12,10 @@
     <string name="connect">Connect</string>
     <string name="control_screen">control screen</string>
     <string name="button">Button</string>
+    <string name="type_url">Type URL</string>
+    <string name="localhost1">LocalHost1</string>
+    <string name="localhost2">localhost2</string>
+    <string name="localhost3">localhost3</string>
+    <string name="localhost4">localhost4</string>
+    <string name="localhost5">localhost5</string>
 </resources>
