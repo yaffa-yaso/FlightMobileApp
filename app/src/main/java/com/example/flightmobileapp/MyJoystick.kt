@@ -4,12 +4,16 @@ import android.content.Context
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.PorterDuff
+import android.os.Build
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.view.View
 import android.view.View.OnTouchListener
+import androidx.annotation.RequiresApi
+import kotlin.math.pow
+import kotlin.math.sqrt
 
 
 /**
@@ -21,12 +25,12 @@ class MyJoystick : SurfaceView, SurfaceHolder.Callback, OnTouchListener {
     private var baseRadius = 0f
     private var hatRadius = 0f
     private var joystickCallback: JoystickListener? = null
-    private val ratio = 5 //The smaller, the more shading will occur
+    private val ratio = 2 //The smaller, the more shading will occur
     private fun setupDimensions() {
         centerX = width / 2.toFloat()
         centerY = height / 2.toFloat()
-        baseRadius = Math.min(width, height) / 3.toFloat()
-        hatRadius = Math.min(width, height) / 5.toFloat()
+        baseRadius = width.coerceAtMost(height) / 3.toFloat()
+        hatRadius = width.coerceAtMost(height) / 7.toFloat()
     }
 
     constructor(context: Context?) : super(context) {
@@ -54,6 +58,7 @@ class MyJoystick : SurfaceView, SurfaceHolder.Callback, OnTouchListener {
         if (context is JoystickListener) joystickCallback = context
     }
 
+    @RequiresApi(Build.VERSION_CODES.Q)
     private fun drawJoystick(newX: Float, newY: Float) {
         if (holder.surface.isValid) {
             val myCanvas = this.holder.lockCanvas() //Stuff to draw
@@ -62,47 +67,33 @@ class MyJoystick : SurfaceView, SurfaceHolder.Callback, OnTouchListener {
                 Color.TRANSPARENT,
                 PorterDuff.Mode.CLEAR
             ) // Clear the BG
+            myCanvas.drawRGB(225,225,225)
 
             //First determine the sin and cos of the angle that the touched point is at relative to the center of the joystick
-            val hypotenuse = Math.sqrt(
-                Math.pow(
-                    newX - centerX.toDouble(),
-                    2.0
-                ) + Math.pow(newY - centerY.toDouble(), 2.0)
+            val hypotenuse = sqrt(
+                (newX - centerX.toDouble()).pow(2.0) + (newY - centerY.toDouble()).pow(2.0)
             ).toFloat()
             val sin = (newY - centerY) / hypotenuse //sin = o/h
             val cos = (newX - centerX) / hypotenuse //cos = a/h
 
             //Draw the base first before shading
-            colors.setARGB(255, 100, 100, 100)
+            colors.setARGB(255, 40, 40, 40)
             myCanvas.drawCircle(centerX, centerY, baseRadius, colors)
-            for (i in 1..(baseRadius / ratio).toInt()) {
-                colors.setARGB(
-                    150 / i,
-                    255,
-                    0,
-                    0
-                ) //Gradually decrease the shade of black drawn to create a nice shading effect
-                myCanvas.drawCircle(
-                    newX - cos * hypotenuse * (ratio / baseRadius) * i,
-                    newY - sin * hypotenuse * (ratio / baseRadius) * i,
-                    i * (hatRadius * ratio / baseRadius),
-                    colors
-                ) //Gradually increase the size of the shading effect
-            }
+
+            //Drawing the joystick hat
 
             //Drawing the joystick hat
             for (i in 0..(hatRadius / ratio).toInt()) {
                 colors.setARGB(
                     255,
-                    (i * (255 * ratio / hatRadius)).toInt(),
-                    (i * (255 * ratio / hatRadius)).toInt(),
-                    255
+                    70 + 2*i,
+                    70 + 2*i,
+                    70 + 2*i
                 ) //Change the joystick color for shading purposes
                 myCanvas.drawCircle(
                     newX,
                     newY,
-                    hatRadius - i.toFloat() * ratio / 2,
+                    hatRadius - i.toFloat() * ratio,
                     colors
                 ) //Draw the shading for the hat
             }
@@ -110,6 +101,7 @@ class MyJoystick : SurfaceView, SurfaceHolder.Callback, OnTouchListener {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.Q)
     override fun surfaceCreated(holder: SurfaceHolder) {
         setupDimensions()
         drawJoystick(centerX, centerY)
@@ -124,14 +116,12 @@ class MyJoystick : SurfaceView, SurfaceHolder.Callback, OnTouchListener {
     }
 
     override fun surfaceDestroyed(holder: SurfaceHolder) {}
+    @RequiresApi(Build.VERSION_CODES.Q)
     override fun onTouch(v: View, e: MotionEvent): Boolean {
         if (v == this) {
             if (e.action != MotionEvent.ACTION_UP) {
-                val displacement = Math.sqrt(
-                    Math.pow(
-                        e.x - centerX.toDouble(),
-                        2.0
-                    ) + Math.pow(e.y - centerY.toDouble(), 2.0)
+                val displacement = sqrt(
+                    (e.x - centerX.toDouble()).pow(2.0) + (e.y - centerY.toDouble()).pow(2.0)
                 ).toFloat()
                 if (displacement < baseRadius) {
                     drawJoystick(e.x, e.y)
