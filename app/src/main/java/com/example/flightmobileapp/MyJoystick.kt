@@ -67,7 +67,7 @@ class MyJoystick : SurfaceView, SurfaceHolder.Callback, OnTouchListener {
                 Color.TRANSPARENT,
                 PorterDuff.Mode.CLEAR
             ) // Clear the BG
-            myCanvas.drawRGB(225,225,225)
+            myCanvas.drawRGB(92,92,92)
 
             //First determine the sin and cos of the angle that the touched point is at relative to the center of the joystick
             val hypotenuse = sqrt(
