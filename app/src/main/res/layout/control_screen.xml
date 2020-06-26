@@ -6,25 +6,54 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <ImageView
+        android:id="@+id/backRound"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#5C5C5C"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="5dp" />
+
     <TextView
-        android:id="@+id/textView"
-        android:layout_width="119dp"
-        android:layout_height="29dp"
-        android:text="@string/control_screen"
+        android:id="@+id/rudderText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="rudder"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.115"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.925" />
 
-    <ImageView
-        android:id="@+id/imageV"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+    <TextView
+        android:id="@+id/throttleText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="throttle"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.841"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/seekBar2"
+        app:layout_constraintVertical_bias="0.376" />
+
+    <TextView
+        android:id="@+id/elevatorVal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="0"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/joystick"
+        app:layout_constraintHorizontal_bias="0.648"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.723" />
 
     <com.example.flightmobileapp.MyJoystick
         android:id="@+id/joystick"
-        android:layout_width="214dp"
-        android:layout_height="201dp"
+        android:layout_width="206dp"
+        android:layout_height="186dp"
         android:layout_marginTop="211dp"
         android:layout_weight="1"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -32,7 +61,85 @@
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.733"
+        app:layout_constraintVertical_bias="0.667"
         tools:ignore="MissingConstraints" />
+
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="5dp"
+        android:scaleY="4"
+        android:indeterminateTint="@color/colorPrimary"
+        android:indeterminateBehavior="repeat"
+        android:indeterminate="true"
+        tools:ignore="MissingConstraints" />
+
+    <ImageView
+        android:id="@+id/imageV"
+        android:layout_width="316dp"
+        android:layout_height="296dp"
+        app:layout_constraintBottom_toTopOf="@+id/joystick"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/progress_bar" />
+
+    <SeekBar
+        android:id="@+id/seekBar"
+        android:layout_width="169dp"
+        android:layout_height="32dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/joystick"
+        app:layout_constraintVertical_bias="0.354" />
+
+    <SeekBar
+        android:id="@+id/seekBar2"
+        android:layout_width="169dp"
+        android:layout_height="32dp"
+        android:rotation="-90"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.742"
+        app:layout_constraintStart_toEndOf="@+id/joystick"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.718" />
+
+    <TextView
+        android:id="@+id/aileronVul"
+        android:layout_width="8dp"
+        android:layout_height="wrap_content"
+        android:text="0"
+        app:layout_constraintBottom_toTopOf="@+id/joystick"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.501"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageV"
+        app:layout_constraintVertical_bias="0.86" />
+
+    <TextView
+        android:id="@+id/aileronText"
+        android:layout_width="77dp"
+        android:layout_height="24dp"
+        android:text="- aileron -"
+        app:layout_constraintBottom_toTopOf="@+id/joystick"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageV"
+        app:layout_constraintVertical_bias="0.32" />
+
+    <TextView
+        android:id="@+id/elevatorText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="- elevator -"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/joystick"
+        app:layout_constraintHorizontal_bias="0.432"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.723"
+        android:rotation="90"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

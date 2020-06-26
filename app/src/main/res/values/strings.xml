@@ -18,4 +18,5 @@
     <string name="localhost3">localhost3</string>
     <string name="localhost4">localhost4</string>
     <string name="localhost5">localhost5</string>
+    <string name="simulator_image">simulator Image</string>
 </resources>

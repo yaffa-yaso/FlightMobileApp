@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#02AE9E"
+    android:background="#FFFFFF"
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
     <Button
@@ -14,19 +14,7 @@
         android:text="@string/connect"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.777"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.805" />
-
-    <Button
-        android:id="@+id/URL"
-        android:layout_width="173dp"
-        android:layout_height="48dp"
-        android:text="@string/type_url"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/goToControlScreen"
-        app:layout_constraintHorizontal_bias="0.435"
+        app:layout_constraintHorizontal_bias="0.842"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.805" />
@@ -35,6 +23,7 @@
         android:id="@+id/localhost1"
         android:layout_width="251dp"
         android:layout_height="62dp"
+        android:backgroundTint="#009688"
         android:text="@string/localhost1"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -48,6 +37,7 @@
         android:layout_width="251dp"
         android:layout_height="62dp"
         android:layout_marginTop="21dp"
+        android:backgroundTint="#009688"
         android:text="@string/localhost2"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -60,6 +50,7 @@
         android:id="@+id/localhost3"
         android:layout_width="251dp"
         android:layout_height="62dp"
+        android:backgroundTint="#009688"
         android:text="@string/localhost3"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -72,6 +63,7 @@
         android:id="@+id/localhost4"
         android:layout_width="251dp"
         android:layout_height="62dp"
+        android:backgroundTint="#009688"
         android:text="@string/localhost4"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -84,6 +76,7 @@
         android:id="@+id/localhost5"
         android:layout_width="251dp"
         android:layout_height="62dp"
+        android:backgroundTint="#009688"
         android:text="@string/localhost5"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -93,14 +86,20 @@
         app:layout_constraintVertical_bias="0.098" />
 
     <EditText
-        android:id="@+id/URLText"
+        android:id="@+id/urlText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="113dp"
         android:ems="10"
         android:inputType="textPersonName"
-        android:text="Name"
-        tools:layout_editor_absoluteX="100dp"
-        tools:layout_editor_absoluteY="639dp" />
+        android:text="@string/type_url"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/goToControlScreen"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.806"
+        tools:ignore="TextFields" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

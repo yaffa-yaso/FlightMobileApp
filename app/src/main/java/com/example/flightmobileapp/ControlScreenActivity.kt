@@ -2,49 +2,47 @@ package com.example.flightmobileapp
 
 import android.graphics.BitmapFactory
 import android.os.Bundle
-import android.telecom.Call
-import android.text.Editable
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-import javax.security.auth.callback.Callback
-
-import android.view.View
-import android.widget.Button
-import android.widget.EditText
-import android.widget.TextView
-import android.widget.Toast
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.activity_main.*
+import com.google.gson.GsonBuilder
 import kotlinx.android.synthetic.main.control_screen.*
+import okhttp3.ResponseBody
+import retrofit2.Call
+import retrofit2.Callback
 import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
 class ControlScreenActivity: AppCompatActivity(), JoystickListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val joystick = MyJoystick(this)
-        val s: Editable? = (findViewById<View>(R.id.urlText) as EditText).text
-        val request = ServiceBuilder.buildService(TmdbEndpoints::class.java, s.toString())
-        val call = request.getImage()
+        MyJoystick(this)
 
-        call.enqueue(object : retrofit2.Callback<SimulatorImage>{
-            override fun onResponse(call: retrofit2.Call<SimulatorImage>, response: Response<SimulatorImage>) {
-                if (response.isSuccessful){
-                    progress_bar.visibility = View.GONE
-                    recyclerView.apply {
-                        setHasFixedSize(true)
-                        layoutManager = LinearLayoutManager(this@ControlScreenActivity)
-                        adapter = ImagesAdapter(response.body()!!.results)
-                    }
+        val json = GsonBuilder().setLenient().create()
+
+        val retrofit = Retrofit.Builder()
+            .baseUrl("http://10.0.2.2:44310/")
+            .addConverterFactory(GsonConverterFactory.create(json))
+            .build()
+
+        val api = retrofit.create(Api::class.java)
+
+        val body = api.getImg().enqueue(object : Callback<ResponseBody> {
+            override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+                val bytes = response.body()?.byteStream()
+                val bitmap = BitmapFactory.decodeStream(bytes)
+                runOnUiThread {
+                    imageV.setImageBitmap(bitmap)
                 }
             }
-            override fun onFailure(call: retrofit2.Call<SimulatorImage>, t: Throwable) {
-                Toast.makeText(this@ControlScreenActivity, "${t.message}", Toast.LENGTH_SHORT).show()
+            override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                return
             }
         })
 
         setContentView(R.layout.control_screen)
+
     }
 
     override fun onJoystickMoved(xPercent: Float, yPercent: Float, id: Int) {
