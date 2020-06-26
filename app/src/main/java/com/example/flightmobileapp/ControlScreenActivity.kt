@@ -3,6 +3,9 @@ package com.example.flightmobileapp
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.util.Log
+import android.view.View
+import android.widget.SeekBar
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.google.gson.GsonBuilder
 import kotlinx.android.synthetic.main.control_screen.*
@@ -43,9 +46,21 @@ class ControlScreenActivity: AppCompatActivity(), JoystickListener {
 
         setContentView(R.layout.control_screen)
 
+        rudderSeekBar.setOnSeekBarChangeListener(rudderText, rudderSeekBar.progress)
+        throttleSeekBar.setOnSeekBarChangeListener(throttleText, throttleSeekBar.progress)
+
     }
 
     override fun onJoystickMoved(xPercent: Float, yPercent: Float, id: Int) {
         Log.d("Joystick", "X percent: $xPercent Y percent: $yPercent")
     }
 }
+
+private fun SeekBar.setOnSeekBarChangeListener(text: TextView?, i: Number) {
+    if (text != null) {
+        text.text = i.toString()
+    }
+}
+
+
+
