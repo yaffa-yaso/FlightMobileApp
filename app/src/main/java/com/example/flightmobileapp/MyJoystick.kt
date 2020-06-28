@@ -11,9 +11,7 @@ import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.view.View
 import android.view.View.OnTouchListener
-import android.widget.TextView
 import androidx.annotation.RequiresApi
-import kotlinx.android.synthetic.main.control_screen.view.*
 import kotlin.math.pow
 import kotlin.math.sqrt
 
@@ -129,11 +127,8 @@ class MyJoystick : SurfaceView, SurfaceHolder.Callback, OnTouchListener {
                     drawJoystick(e.x, e.y)
                     joystickCallback!!.onJoystickMoved(
                         (e.x - centerX) / baseRadius,
-                        (e.y - centerY) / baseRadius,
-                        id
+                        (e.y - centerY) / baseRadius
                     )
-/*                    findViewById<TextView>(R.id.aileronVal).text = (e.x/baseRadius).toString()
-                    findViewById<TextView>(R.id.elevatorVal).text = (e.y/baseRadius).toString()*/
                 } else {
                     val ratio = baseRadius / displacement
                     val constrainedX = centerX + (e.x - centerX) * ratio
@@ -141,16 +136,11 @@ class MyJoystick : SurfaceView, SurfaceHolder.Callback, OnTouchListener {
                     drawJoystick(constrainedX, constrainedY)
                     joystickCallback!!.onJoystickMoved(
                         (constrainedX - centerX) / baseRadius,
-                        (constrainedY - centerY) / baseRadius,
-                        id
+                        (constrainedY - centerY) / baseRadius
                     )
- /*                   findViewById<TextView>(R.id.aileronVal).text = (constrainedX/baseRadius).toString()
-                    findViewById<TextView>(R.id.elevatorVal).text = (constrainedY/baseRadius).toString()*/
                 }
             } else drawJoystick(centerX, centerY)
-            joystickCallback!!.onJoystickMoved(0f, 0f, id)
-           /* findViewById<TextView>(R.id.aileronVal).text = "0"
-            findViewById<TextView>(R.id.elevatorVal).text = "0"*/
+            joystickCallback!!.onJoystickMoved(0f, 0f)
         }
         return true
     }
