@@ -1,11 +1,13 @@
 package com.example.flightmobileapp
 
+import android.annotation.SuppressLint
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.util.Log
+import android.view.MotionEvent
 import android.view.View
 import android.widget.SeekBar
-import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.gson.GsonBuilder
 import kotlinx.android.synthetic.main.control_screen.*
@@ -15,17 +17,20 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import kotlin.math.round
+
 
 class ControlScreenActivity: AppCompatActivity(), JoystickListener {
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        MyJoystick(this)
+        val joystick = MyJoystick(this)
 
         val json = GsonBuilder().setLenient().create()
 
         val retrofit = Retrofit.Builder()
-            .baseUrl("http://10.0.2.2:44310/")
+            .baseUrl("http://10.0.2.2:5000/")
             .addConverterFactory(GsonConverterFactory.create(json))
             .build()
 
@@ -33,34 +38,61 @@ class ControlScreenActivity: AppCompatActivity(), JoystickListener {
 
         val body = api.getImg().enqueue(object : Callback<ResponseBody> {
             override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
-                val bytes = response.body()?.byteStream()
-                val bitmap = BitmapFactory.decodeStream(bytes)
-                runOnUiThread {
-                    imageV.setImageBitmap(bitmap)
+                if (response.isSuccessful) {
+                    println("response is successful")
+                    val bytes = response.body()?.byteStream()
+                    val bitmap = BitmapFactory.decodeStream(bytes)
+                    runOnUiThread {
+                        while (true) {
+                            imageV.setImageBitmap(bitmap)
+                        }
+                    }
+                } else{
+                    println("an error occured")
                 }
             }
             override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
-                return
+               println("failed in getting image $call ,--- $t")
             }
         })
 
         setContentView(R.layout.control_screen)
 
-        rudderSeekBar.setOnSeekBarChangeListener(rudderText, rudderSeekBar.progress)
-        throttleSeekBar.setOnSeekBarChangeListener(throttleText, throttleSeekBar.progress)
+
+        rudderSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+
+            override fun onProgressChanged(seekBar: SeekBar, i: Int, b: Boolean) {
+                // Display the current progress of SeekBar
+                rudderVal.text = (i.toDouble()/100).toString()
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar) {
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar) {
+            }
+        })
+
+        throttleSeekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+
+            override fun onProgressChanged(seekBar: SeekBar, i: Int, b: Boolean) {
+                // Display the current progress of SeekBar
+                throttleVal.text = (i.toDouble()/100).toString()
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar) {
+            }
+
+            override fun onStopTrackingTouch(seekBar: SeekBar) {
+            }
+        })
+
+
 
     }
 
-    override fun onJoystickMoved(xPercent: Float, yPercent: Float, id: Int) {
-        Log.d("Joystick", "X percent: $xPercent Y percent: $yPercent")
+    override fun onJoystickMoved(x: Float, y: Float) {
+        elevatorVal.text = (round(x*100)).toString()
+        aileronVal.text = (round(y*100)).toString()
     }
 }
-
-private fun SeekBar.setOnSeekBarChangeListener(text: TextView?, i: Number) {
-    if (text != null) {
-        text.text = i.toString()
-    }
-}
-
-
-
