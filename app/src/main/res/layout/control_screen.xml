@@ -21,10 +21,9 @@
         android:text="rudder"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.164"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.92" />
+        app:layout_constraintVertical_bias="0.977" />
 
     <TextView
         android:id="@+id/elevatorVal"
@@ -42,13 +41,14 @@
         android:id="@+id/throttleText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:rotation="90"
         android:text="throttle"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.871"
+        app:layout_constraintHorizontal_bias="0.994"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/throttleSeekBar"
-        app:layout_constraintVertical_bias="0.325" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.723" />
 
     <com.example.flightmobileapp.MyJoystick
         android:id="@+id/joystick"
@@ -103,10 +103,10 @@
         android:rotation="90"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.742"
+        app:layout_constraintHorizontal_bias="0.757"
         app:layout_constraintStart_toEndOf="@+id/joystick"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.718" />
+        app:layout_constraintVertical_bias="0.736" />
 
     <TextView
         android:id="@+id/aileronVal"
@@ -143,5 +143,25 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.723"
         android:rotation="90"/>
+
+    <TextView
+        android:id="@+id/rudderVal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="0"
+        tools:layout_editor_absoluteX="94dp"
+        tools:layout_editor_absoluteY="648dp" />
+
+    <TextView
+        android:id="@+id/throttleVal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="0"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.841"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/backRound"
+        app:layout_constraintVertical_bias="0.87" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
