@@ -139,8 +139,10 @@ class MyJoystick : SurfaceView, SurfaceHolder.Callback, OnTouchListener {
                         (constrainedY - centerY) / baseRadius
                     )
                 }
-            } else drawJoystick(centerX, centerY)
-            joystickCallback!!.onJoystickMoved(0f, 0f)
+            } else {
+                drawJoystick(centerX, centerY)
+                joystickCallback!!.onJoystickMoved(0f, 0f)
+            }
         }
         return true
     }

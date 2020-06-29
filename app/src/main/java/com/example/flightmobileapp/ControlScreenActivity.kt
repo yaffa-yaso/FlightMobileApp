@@ -93,8 +93,10 @@ class ControlScreenActivity: AppCompatActivity(), JoystickListener {
     }
 
     override fun onJoystickMoved(x: Float, y: Float) {
-        elevatorVal.text = (round(x*100)).toString()
-        aileronVal.text = (round(y*100)).toString()
+
+            elevatorVal.text = String.format("%.2f",x)
+            aileronVal.text = String.format("%.2f",y)
+
         sendPost()
     }
 
