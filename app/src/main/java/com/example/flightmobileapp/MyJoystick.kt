@@ -127,7 +127,8 @@ class MyJoystick : SurfaceView, SurfaceHolder.Callback, OnTouchListener {
                     drawJoystick(e.x, e.y)
                     joystickCallback!!.onJoystickMoved(
                         (e.x - centerX) / baseRadius,
-                        (e.y - centerY) / baseRadius
+                        (e.y - centerY) / baseRadius,
+                        2*baseRadius
                     )
                 } else {
                     val ratio = baseRadius / displacement
@@ -136,12 +137,13 @@ class MyJoystick : SurfaceView, SurfaceHolder.Callback, OnTouchListener {
                     drawJoystick(constrainedX, constrainedY)
                     joystickCallback!!.onJoystickMoved(
                         (constrainedX - centerX) / baseRadius,
-                        (constrainedY - centerY) / baseRadius
+                        (constrainedY - centerY) / baseRadius,
+                        2*baseRadius
                     )
                 }
             } else {
                 drawJoystick(centerX, centerY)
-                joystickCallback!!.onJoystickMoved(0f, 0f)
+                joystickCallback!!.onJoystickMoved(0f, 0f, 2*baseRadius)
             }
         }
         return true

@@ -19,6 +19,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.io.DataOutputStream
 import java.net.HttpURLConnection
 import java.net.URL
+import kotlin.math.abs
 import kotlin.math.round
 
 
@@ -32,7 +33,7 @@ class ControlScreenActivity: AppCompatActivity(), JoystickListener {
         val json = GsonBuilder().setLenient().create()
 
         val retrofit = Retrofit.Builder()
-            .baseUrl("http://10.0.2.2:5000/")
+            .baseUrl("http://10.0.2.2:50066/")
             .addConverterFactory(GsonConverterFactory.create(json))
             .build()
 
@@ -92,12 +93,16 @@ class ControlScreenActivity: AppCompatActivity(), JoystickListener {
         })
     }
 
-    override fun onJoystickMoved(x: Float, y: Float) {
+    override fun onJoystickMoved(x: Float, y: Float, diameter: Float) {
+        val xDis = abs(x - elevatorVal.text.toString().toFloat())
+        val yDis = abs(y - aileronVal.text.toString().toFloat())
 
-            elevatorVal.text = String.format("%.2f",x)
-            aileronVal.text = String.format("%.2f",y)
+        elevatorVal.text = String.format("%.2f",x)
+        aileronVal.text = String.format("%.2f",y)
 
-        sendPost()
+        if(xDis/diameter*100 > 1 || yDis/diameter*100 > 1){
+            sendPost()
+        }
     }
 
     fun sendPost() {
